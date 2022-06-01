@@ -3,11 +3,11 @@ MaterialDesignInXamlToolkit PackIcon to image exporter.
 
 Application for exporting MaterialDesignInXamlToolkit PackIcons created as a path to image files in diffrent sizes.  
 
-![PackIconToImage Example (Images/Example.png)](../Images/Example.png)  
+![PackIconToImage Example (Images/Example.png)](Images/Example.png)  
 
 ## Description
 
-![PackIconToImage Description (Images/Description.png)](../Images/Description.png)  
+![PackIconToImage Description (Images/Description.png)](Images/Description.png)  
 
 1. Search - allows to search PackIcon by its name. 
 2. View - list of all or found PackIcons that can be selected for export (only one at the time). 
