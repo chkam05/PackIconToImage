@@ -1,0 +1,498 @@
+﻿<Window 
+    x:Class="chkam05.PackIconToImage.Windows.MainWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:converters="clr-namespace:chkam05.PackIconToImage.Converters"
+    xmlns:local="clr-namespace:chkam05.PackIconToImage.Windows"
+    xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+    mc:Ignorable="d"
+    
+    DataContext="{Binding RelativeSource={RelativeSource Self}}"
+    FontSize="12"
+    Height="450"
+    Title="PackIcon to Image"
+    Width="800">
+
+    <Window.Resources>
+        <ResourceDictionary>
+            
+            <!-- Converters. -->
+            <converters:ColorNameConverter x:Key="ColorNameConverter"/>
+            <converters:PackIconKindNameConverter x:Key="PackIconKindNameConverter"/>
+            <converters:PageCountNameConverter x:Key="PageCountNameConverter"/>
+
+            <!-- Styles -->
+            <Style x:Key="Control_ButtonStyle" TargetType="{x:Type Button}">
+                <Setter Property="MinWidth" Value="32"/>
+                <Setter Property="Padding" Value="16,4"/>
+            </Style>
+
+            <Style x:Key="ControlButton_PackIconStyle" TargetType="materialDesign:PackIcon">
+                <Setter Property="MinHeight" Value="16"/>
+                <Setter Property="MinWidth" Value="16"/>
+            </Style>
+
+            <Style x:Key="PackIconKind_ListViewItemStyle" TargetType="{x:Type ListViewItem}">
+                <Setter Property="Margin" Value="2"/>
+            </Style>
+
+            <Style x:Key="Size_ListViewItemStyle" TargetType="{x:Type ListViewItem}">
+                <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+            </Style>
+
+            <Style x:Key="TextBoxStyle" TargetType="{x:Type TextBox}">
+                <Setter Property="MinWidth" Value="48"/>
+                <Setter Property="VerticalContentAlignment" Value="Center"/>
+            </Style>
+
+            <!-- Data Templates. -->
+            <DataTemplate x:Key="ColorItemsDataTemplate">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="64"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <Border
+                        Grid.Column="0"
+                        HorizontalAlignment="Stretch"
+                        Margin="2"
+                        VerticalAlignment="Stretch">
+                        <Border.Background>
+                            <SolidColorBrush Color="{Binding .}"/>
+                        </Border.Background>
+                    </Border>
+
+                    <TextBlock
+                        Grid.Column="1"
+                        Margin="4,0,0,0"
+                        Text="{Binding ., Converter={StaticResource ColorNameConverter}}"/>
+
+                </Grid>
+            </DataTemplate>
+            
+            <DataTemplate x:Key="PackIconKindItemsDataTemplate">
+                <materialDesign:PackIcon
+                    Kind="{Binding .}"
+                    Height="64"
+                    Width="64"/>
+            </DataTemplate>
+
+            <DataTemplate x:Key="PageCountItemsDataTemplate">
+                <TextBlock
+                    Text="{Binding ., Converter={StaticResource PageCountNameConverter}}"/>
+            </DataTemplate>
+
+            <DataTemplate x:Key="SizeItemsDataTemplate">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="auto"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <StackPanel
+                        Grid.Column="0"
+                        Orientation="Horizontal">
+
+                        <TextBox
+                            Height="26"
+                            Style="{StaticResource TextBoxStyle}"
+                            TextAlignment="Right"
+                            Text="{Binding Width}"
+                            Width="64"/>
+
+                        <TextBlock
+                            Margin="4,0"
+                            Text="x"
+                            VerticalAlignment="Center"/>
+
+                        <TextBox
+                            Height="26"
+                            Style="{StaticResource TextBoxStyle}"
+                            TextAlignment="Right"
+                            Text="{Binding Height}"
+                            Width="64"/>
+
+                    </StackPanel>
+
+                    <StackPanel
+                        Grid.Column="2"
+                        Orientation="Horizontal">
+
+                        <Button
+                            ToolTip="Remove item"
+                            Style="{StaticResource Control_ButtonStyle}"
+                            Click="RemoveSizeButton_Click">
+
+                            <materialDesign:PackIcon
+                                Kind="Remove"
+                                Style="{StaticResource ControlButton_PackIconStyle}"/>
+
+                        </Button>
+
+                    </StackPanel>
+
+                </Grid>
+            </DataTemplate>
+
+        </ResourceDictionary>
+    </Window.Resources>
+    
+    <Grid>
+
+        <Grid.RowDefinitions>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <Border
+            Background="LightGray"
+            BorderBrush="Gray"
+            BorderThickness="0,0,0,1"
+            Grid.Row="0"
+            Padding="8">
+
+            <StackPanel
+                HorizontalAlignment="Center"
+                Orientation="Horizontal">
+
+                <TextBox
+                    x:Name="SearchTextBox"
+                    MinWidth="192"
+                    Style="{StaticResource TextBoxStyle}"
+                    KeyDown="SearchTextBox_KeyDown"/>
+
+                <Button
+                    x:Name="SearchButton"
+                    Style="{StaticResource Control_ButtonStyle}"
+                    ToolTip="Search"
+                    Click="SearchButton_Click">
+
+                    <materialDesign:PackIcon
+                        Kind="Search"
+                        Style="{StaticResource ControlButton_PackIconStyle}"/>
+
+                </Button>
+
+            </StackPanel>
+
+        </Border>
+
+        <Grid
+            Grid.Row="1">
+
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="auto"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <Border
+                Background="LightGray"
+                BorderBrush="Gray"
+                BorderThickness="0,0,1,0"
+                Grid.Column="0"
+                MinWidth="288">
+
+                <Grid>
+
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="auto"/>
+                    </Grid.RowDefinitions>
+
+                    <ScrollViewer
+                        Grid.Row="0"
+                        Padding="8"
+                        HorizontalScrollBarVisibility="Disabled"
+                        VerticalScrollBarVisibility="Visible">
+
+                        <StackPanel
+                            Orientation="Vertical">
+
+                            <Border
+                                Margin="0,0,0,8"
+                                HorizontalAlignment="Center">
+
+                                <Border.Background>
+                                    <SolidColorBrush Color="{Binding ColorsView.BackgroundSelected}"/>
+                                </Border.Background>
+
+                                <materialDesign:PackIcon
+                                    Height="48"
+                                    Kind="{Binding PackIconKindView.Selected}"
+                                    Width="48">
+
+                                    <materialDesign:PackIcon.Foreground>
+                                        <SolidColorBrush Color="{Binding ColorsView.ForegroundSelected}"/>
+                                    </materialDesign:PackIcon.Foreground>
+
+                                </materialDesign:PackIcon>
+
+                            </Border>
+
+                            <TextBox
+                                HorizontalAlignment="Center"
+                                IsReadOnly="True"
+                                MinWidth="160"
+                                Style="{StaticResource TextBoxStyle}"
+                                TextAlignment="Center"
+                                Text="{Binding PackIconKindView.Selected, Converter={StaticResource PackIconKindNameConverter}}"/>
+
+                            <TextBlock
+                                Margin="0,16,0,0"
+                                Text="Background color:"/>
+
+                            <ComboBox
+                                x:Name="BackgroundColorComboBox"
+                                ItemsSource="{Binding ColorsView.Items}"
+                                ItemTemplate="{StaticResource ColorItemsDataTemplate}"
+                                MinWidth="128"
+                                SelectedItem="{Binding ColorsView.BackgroundSelected}"/>
+
+                            <TextBlock
+                                Margin="0,16,0,0"
+                                Text="Foreground color:"/>
+
+                            <ComboBox
+                                x:Name="ForegroundColorComboBox"
+                                ItemsSource="{Binding ColorsView.Items}"
+                                ItemTemplate="{StaticResource ColorItemsDataTemplate}"
+                                MinWidth="128"
+                                SelectedItem="{Binding ColorsView.ForegroundSelected}"/>
+
+                            <TextBlock
+                                Margin="0,16,0,0"
+                                Text="Dimensions:"/>
+
+                            <ListView
+                                x:Name="SizesListView"
+                                Background="Transparent"
+                                BorderThickness="0"
+                                ItemContainerStyle="{StaticResource Size_ListViewItemStyle}"
+                                ItemsSource="{Binding SizeView.Items}"
+                                ItemTemplate="{StaticResource SizeItemsDataTemplate}"
+                                ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                                PreviewMouseWheel="ListView_PreviewMouseWheelToParent"/>
+
+                        </StackPanel>
+
+                    </ScrollViewer>
+
+                    <Border
+                        BorderBrush="Gray"
+                        BorderThickness="0,1,0,0"
+                        Grid.Row="1"
+                        Padding="8">
+
+                        <Grid>
+                            
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="auto"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="auto"/>
+                            </Grid.ColumnDefinitions>
+
+                            <StackPanel
+                                Grid.Column="0"
+                                Orientation="Horizontal">
+
+                                <StackPanel
+                                    Orientation="Vertical">
+
+                                    <TextBlock
+                                        Text="Width"/>
+
+                                    <TextBox
+                                        Height="26"
+                                        Style="{StaticResource TextBoxStyle}"
+                                        TextAlignment="Right"
+                                        Text="{Binding SizeView.EditableSizeWidth}"
+                                        Width="64"/>
+
+                                </StackPanel>
+
+                                <StackPanel
+                                    Orientation="Vertical">
+
+                                    <TextBlock
+                                        Text="Height"/>
+
+                                    <TextBox
+                                        Height="26"
+                                        Style="{StaticResource TextBoxStyle}"
+                                        TextAlignment="Right"
+                                        Text="{Binding SizeView.EditableSizeHeight}"
+                                        Width="64"/>
+
+                                </StackPanel>
+
+                                <Button
+                                    x:Name="AddSizeButton"
+                                    ToolTip="Add size"
+                                    Style="{StaticResource Control_ButtonStyle}"
+                                    VerticalAlignment="Bottom"
+                                    Click="AddSizeButton_Click">
+
+                                    <materialDesign:PackIcon
+                                        Kind="Add"
+                                        Style="{StaticResource ControlButton_PackIconStyle}"/>
+
+                                </Button>
+
+                            </StackPanel>
+
+                            <StackPanel
+                                Grid.Column="2"
+                                Orientation="Horizontal">
+
+                                <Button
+                                    x:Name="SaveButton"
+                                    ToolTip="Generate and save images"
+                                    VerticalAlignment="Bottom"
+                                    Click="SaveButton_Click">
+
+                                    <materialDesign:PackIcon
+                                        Kind="ContentSaveEdit"
+                                        Style="{StaticResource ControlButton_PackIconStyle}"/>
+
+                                    <Button.Style>
+                                        <Style BasedOn="{StaticResource Control_ButtonStyle}" TargetType="{x:Type Button}">
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding SizeView.Items.Count}" Value="0">
+                                                    <Setter Property="IsEnabled" Value="False"/>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Button.Style>
+
+                                </Button>
+
+                            </StackPanel>
+
+                        </Grid>
+
+                    </Border>
+
+                </Grid>
+
+            </Border>
+
+            <Grid
+                Grid.Column="1">
+
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="auto"/>
+                </Grid.RowDefinitions>
+
+                <ListView
+                    BorderThickness="0"
+                    Grid.Row="0"
+                    ItemContainerStyle="{StaticResource PackIconKind_ListViewItemStyle}"
+                    ItemsSource="{Binding PackIconKindView.Items}"
+                    ItemTemplate="{StaticResource PackIconKindItemsDataTemplate}"
+                    ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                    SelectedItem="{Binding PackIconKindView.Selected}">
+
+                    <ListView.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <WrapPanel
+                                Margin="0,0,0,0"
+                                Orientation="Horizontal"/>
+                        </ItemsPanelTemplate>
+                    </ListView.ItemsPanel>
+
+                </ListView>
+
+                <Border
+                    Background="LightGray"
+                    BorderBrush="Gray"
+                    BorderThickness="0,1,0,0"
+                    Grid.Row="1"
+                    Padding="8">
+
+                    <Grid>
+
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="auto"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="auto"/>
+                        </Grid.ColumnDefinitions>
+
+                        <StackPanel
+                            Grid.Column="0"
+                            HorizontalAlignment="Center"
+                            Orientation="Horizontal">
+
+                            <Button
+                                x:Name="PreviousPageButton"
+                                ToolTip="Previous Page"
+                                Style="{StaticResource Control_ButtonStyle}"
+                                Click="PreviousPageButton_Click">
+
+                                <materialDesign:PackIcon
+                                    Kind="PagePreviousOutline"
+                                    Style="{StaticResource ControlButton_PackIconStyle}"/>
+
+                            </Button>
+
+                            <TextBox
+                                IsReadOnly="True"
+                                Style="{StaticResource TextBoxStyle}"
+                                Text="{Binding PackIconKindView.PageIndex, Mode=OneWay}"
+                                TextAlignment="Center"/>
+
+                            <TextBlock
+                                Margin="4,0"
+                                Text="/"
+                                VerticalAlignment="Center"/>
+
+                            <TextBox
+                                IsReadOnly="True"
+                                Style="{StaticResource TextBoxStyle}"
+                                Text="{Binding PackIconKindView.Pages, Mode=OneWay}"
+                                TextAlignment="Center"/>
+
+                            <Button
+                                x:Name="NextPageButton"
+                                ToolTip="Next Page"
+                                Style="{StaticResource Control_ButtonStyle}"
+                                Click="NextPageButton_Click">
+
+                                <materialDesign:PackIcon
+                                    Kind="PageNextOutline"
+                                    Style="{StaticResource ControlButton_PackIconStyle}"/>
+
+                            </Button>
+
+                        </StackPanel>
+
+                        <StackPanel
+                            Grid.Column="2"
+                            HorizontalAlignment="Center"
+                            Orientation="Horizontal">
+
+                            <ComboBox
+                                x:Name="PageCountComboBox"
+                                ItemsSource="{Binding PageCountView.Items}"
+                                ItemTemplate="{StaticResource PageCountItemsDataTemplate}"
+                                MinWidth="128"
+                                SelectedItem="{Binding PageCountView.Selected}"
+                                SelectionChanged="PageCountComboBox_SelectionChanged"/>
+
+                        </StackPanel>
+
+                    </Grid>
+
+                </Border>
+
+            </Grid>
+
+        </Grid>
+
+    </Grid>
+    
+</Window>
